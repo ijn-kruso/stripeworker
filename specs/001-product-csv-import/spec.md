@@ -93,7 +93,7 @@ As a Stripe merchant, I want to map CSV columns to Stripe product fields, so I c
 ### Functional Requirements
 
 - **FR-001**: System MUST be implemented as a Stripe Marketplace App that integrates natively into the Stripe Dashboard
-- **FR-002**: System MUST authenticate users via Stripe's OAuth flow for Marketplace Apps
+- **FR-002**: System MUST authenticate requests via Stripe Apps signed requests (`fetchStripeSignature()` + app signing secret verification)
 - **FR-003**: System MUST export products to CSV format with proper escaping for special characters
 - **FR-004**: System MUST support importing products from CSV files to create new or update existing products
 - **FR-005**: System MUST handle product fields: id, name, description, active status, metadata (as `metadata.` prefixed columns, e.g., `metadata.weight`), and images (as numbered columns `image.01`, `image.02`, etc.)

@@ -38,7 +38,7 @@ Build a Stripe App (UI extension embedded in Stripe Dashboard) enabling merchant
 
 | Principle | Status | Post-Design Assessment |
 |-----------|--------|------------------------|
-| **I. Simplicity First** | ✅ PASS | 4 entities defined (Product, Job, ConnectedAccount, FieldMapping). Clean REST API with 15 endpoints. FieldMapping deferred to P4. No unnecessary abstractions. |
+| **I. Simplicity First** | ✅ PASS | 4 entities defined (Product, Job, AppInstallation, FieldMapping). Clean REST API with 15 endpoints. FieldMapping deferred to P4. No unnecessary abstractions. |
 | **II. Scale Performance** | ✅ PASS | `/import/{jobId}/process` endpoint enables client-side chunking. Batch size configurable (100-500 rows). R2 presigned URLs avoid Worker memory usage. |
 | **III. Serverless** | ✅ PASS | All storage uses KV/R2. No WebSockets or persistent connections. OAuth tokens stored in KV. Job state survives browser close. |
 
