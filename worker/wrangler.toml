@@ -8,8 +8,8 @@ compatibility_date = "2024-01-01"
 # KV Namespace binding for job state storage
 [[kv_namespaces]]
 binding = "STRIPEWORKER_KV"
-id = "YOUR_KV_NAMESPACE_ID"
-preview_id = "YOUR_PREVIEW_KV_NAMESPACE_ID"
+id = "49d8c9d2a2854c3b921f6ac13f07b9b9"
+preview_id = "2fb8d4c558974f54818c669a39f42c3a"
 
 # R2 Bucket binding for CSV file storage
 [[r2_buckets]]
