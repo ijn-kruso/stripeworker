@@ -1,82 +1,106 @@
 /**
  * ProductListView - Main app view embedded in Stripe Dashboard product list
+ * Following Stripe Apps SDK documentation structure exactly
  */
 
+import { useState, useCallback } from 'react';
 import {
   Box,
   ContextView,
-  Divider,
-  Spinner,
+  Button,
+  Link,
 } from '@stripe/ui-extension-sdk/ui';
 import type { ExtensionContextValue } from '@stripe/ui-extension-sdk/context';
+import { createApiClient, Job } from '../api';
 
-import { createApiClient } from '../api';
-import ExportButton from '../components/ExportButton';
-import ImportUpload from '../components/ImportUpload';
-import JobProgress from '../components/JobProgress';
+const ProductListView = ({ userContext }: ExtensionContextValue) => {
+  const [exportStatus, setExportStatus] = useState<string>('');
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
-interface ProductListViewProps {
-  userContext: ExtensionContextValue['userContext'];
-  environment: ExtensionContextValue['environment'];
-}
-
-const ProductListView = ({ userContext, environment: _environment }: ProductListViewProps) => {
-  // Ensure we have required context
+  // Check for required context
   if (!userContext?.id || !userContext?.account?.id) {
     return (
-      <ContextView title="Product CSV Import/Export">
+      <ContextView title="Product CSV Tools">
         <Box css={{ padding: 'medium' }}>
-          <Spinner size="small" />
-          <Box css={{ marginTop: 'small' }}>Loading user context...</Box>
+          Loading...
         </Box>
       </ContextView>
     );
   }
 
-  // Create API client with user context
   const api = createApiClient({
     userId: userContext.id,
     accountId: userContext.account.id,
   });
 
+  const handleExport = useCallback(async () => {
+    setIsExporting(true);
+    setExportStatus('Starting export...');
+    setDownloadUrl(null);
+
+    try {
+      const job = await api.post<Job>('/export/start');
+      setExportStatus(`Exporting products...`);
+
+      // Poll for completion
+      let attempts = 0;
+      while (attempts < 60) {
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        const status = await api.get<Job>(`/jobs/${job.id}`);
+        
+        if (status.status === 'completed') {
+          const download = await api.get<{ downloadUrl: string }>(`/export/${job.id}/download`);
+          setDownloadUrl(download.downloadUrl);
+          setExportStatus(`Export complete! ${status.totalRows} products exported.`);
+          break;
+        } else if (status.status === 'failed') {
+          setExportStatus('Export failed');
+          break;
+        }
+        
+        setExportStatus(`Exporting... ${status.processedRows} products`);
+        attempts++;
+      }
+    } catch (err) {
+      setExportStatus(`Error: ${err instanceof Error ? err.message : 'Export failed'}`);
+    } finally {
+      setIsExporting(false);
+    }
+  }, [api]);
+
   return (
-    <ContextView
-      title="Product CSV Import/Export"
-      description="Export products to CSV or import products from a CSV file"
-    >
+    <ContextView title="Product CSV Import/Export">
       <Box css={{ padding: 'medium', stack: 'y', gap: 'large' }}>
-        {/* Export Section */}
         <Box css={{ stack: 'y', gap: 'small' }}>
-          <Box css={{ font: 'heading', fontWeight: 'semibold' }}>
-            Export Products
+          <Box css={{ fontWeight: 'semibold' }}>Export Products</Box>
+          <Box>Download all your products as a CSV file.</Box>
+          
+          {exportStatus && <Box>{exportStatus}</Box>}
+          
+          <Box css={{ stack: 'x', gap: 'small' }}>
+            <Button 
+              type="primary" 
+              onPress={handleExport}
+              disabled={isExporting}
+            >
+              {isExporting ? 'Exporting...' : 'Export Products to CSV'}
+            </Button>
           </Box>
-          <Box css={{ color: 'secondary' }}>
-            Download all your products as a CSV file for backup or editing.
-          </Box>
-          <ExportButton api={api} />
+          
+          {downloadUrl && (
+            <Box css={{ stack: 'y', gap: 'xsmall' }}>
+              <Link href={downloadUrl} target="_blank">
+                Click here to download your CSV file
+              </Link>
+            </Box>
+          )}
         </Box>
 
-        <Divider />
-
-        {/* Import Section */}
         <Box css={{ stack: 'y', gap: 'small' }}>
-          <Box css={{ font: 'heading', fontWeight: 'semibold' }}>
-            Import Products
-          </Box>
-          <Box css={{ color: 'secondary' }}>
-            Upload a CSV file to create new products or update existing ones.
-          </Box>
-          <ImportUpload api={api} />
-        </Box>
-
-        <Divider />
-
-        {/* Job Progress Section */}
-        <Box css={{ stack: 'y', gap: 'small' }}>
-          <Box css={{ font: 'heading', fontWeight: 'semibold' }}>
-            Recent Jobs
-          </Box>
-          <JobProgress api={api} />
+          <Box css={{ fontWeight: 'semibold' }}>Import Products</Box>
+          <Box>Upload a CSV file to create or update products.</Box>
+          <Box>Coming soon - use Export first to get the CSV format.</Box>
         </Box>
       </Box>
     </ContextView>

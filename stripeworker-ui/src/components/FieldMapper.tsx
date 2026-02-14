@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
-  Icon,
   Select,
   TextField,
   Spinner,
@@ -161,12 +160,12 @@ const FieldMapper = ({
       {/* Saved Mappings */}
       {!isCreating && (
         <Box css={{ stack: 'y', gap: 'small' }}>
-          <Box css={{ font: 'body', fontWeight: 'semibold' }}>
+          <Box css={{ fontWeight: 'semibold' }}>
             Saved Mappings
           </Box>
           
           {mappings.length === 0 ? (
-            <Box css={{ color: 'secondary' }}>
+            <Box>
               No saved mappings. Create one to map custom CSV columns.
             </Box>
           ) : (
@@ -185,16 +184,15 @@ const FieldMapper = ({
           )}
 
           <Button type="secondary" onPress={() => setIsCreating(true)}>
-            <Icon name="add" />
-            <span>Create New Mapping</span>
+            + Create New Mapping
           </Button>
         </Box>
       )}
 
       {/* Create Mapping Form */}
       {isCreating && (
-        <Box css={{ stack: 'y', gap: 'medium', padding: 'medium', background: 'container' }}>
-          <Box css={{ font: 'body', fontWeight: 'semibold' }}>
+        <Box css={{ stack: 'y', gap: 'medium', padding: 'medium' }}>
+          <Box css={{ fontWeight: 'semibold' }}>
             Create Field Mapping
           </Box>
 
@@ -206,7 +204,7 @@ const FieldMapper = ({
           />
 
           <Box css={{ stack: 'y', gap: 'small' }}>
-            <Box css={{ font: 'caption', fontWeight: 'semibold' }}>
+            <Box css={{ fontWeight: 'semibold' }}>
               Column Mappings
             </Box>
             
@@ -263,14 +261,13 @@ const FieldMapper = ({
                   size="small"
                   onPress={() => removeColumnMapping(index)}
                 >
-                  <Icon name="delete" />
+                  ✕
                 </Button>
               </Box>
             ))}
 
             <Button type="secondary" size="small" onPress={addColumnMapping}>
-              <Icon name="add" />
-              <span>Add Column</span>
+              + Add Column
             </Button>
           </Box>
 
@@ -294,12 +291,12 @@ const FieldMapper = ({
         <Box css={{ stack: 'y', gap: 'small' }}>
           {mappings.filter(m => m.id === selectedMappingId).map(mapping => (
             <Box key={mapping.id} css={{ stack: 'y', gap: 'xsmall' }}>
-              <Box css={{ font: 'caption', color: 'secondary' }}>
+              <Box>
                 Mapping: {mapping.name}
               </Box>
-              <Box css={{ font: 'caption' }}>
+              <Box>
                 {mapping.mappings.map(m => (
-                  <Box key={m.csvColumn} css={{ color: 'secondary' }}>
+                  <Box key={m.csvColumn}>
                     {m.csvColumn} → {m.stripeField}
                     {m.transform !== 'none' && ` (${m.transform})`}
                   </Box>

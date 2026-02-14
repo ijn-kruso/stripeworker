@@ -268,6 +268,7 @@ async function processProductRow(
   const params: Stripe.ProductCreateParams = { name: data.name };
   if (data.description !== undefined) params.description = data.description;
   if (data.active !== undefined) params.active = data.active;
+  if (data.tax_code !== undefined) params.tax_code = data.tax_code;
   if (data.metadata !== undefined) params.metadata = data.metadata;
   if (data.images !== undefined) params.images = data.images;
 
@@ -278,6 +279,7 @@ async function processProductRow(
       const updateParams: Stripe.ProductUpdateParams = { name: data.name };
       if (data.description !== undefined) updateParams.description = data.description;
       if (data.active !== undefined) updateParams.active = data.active;
+      if (data.tax_code !== undefined) updateParams.tax_code = data.tax_code;
       if (data.metadata !== undefined) updateParams.metadata = data.metadata;
       if (data.images !== undefined) updateParams.images = data.images;
       

@@ -18,7 +18,7 @@ export interface ProductCsvRow {
 /**
  * Standard CSV column headers
  */
-export const STANDARD_COLUMNS = ['id', 'name', 'description', 'active'] as const;
+export const STANDARD_COLUMNS = ['id', 'name', 'description', 'active', 'tax_code'] as const;
 
 /**
  * Metadata column prefix
@@ -43,6 +43,7 @@ export interface ProductData {
   name: string;
   description?: string;
   active?: boolean;
+  tax_code?: string;
   metadata?: Record<string, string>;
   images?: string[];
 }
@@ -56,6 +57,7 @@ export function stripeProductToCsvRow(product: Stripe.Product): ProductCsvRow {
     name: product.name,
     description: product.description ?? '',
     active: product.active ? 'true' : 'false',
+    tax_code: typeof product.tax_code === 'string' ? product.tax_code : (product.tax_code?.id ?? ''),
   };
 
   // Add metadata columns
@@ -94,6 +96,10 @@ export function csvRowToProductData(row: ProductCsvRow): ProductData {
 
   if (row.active !== undefined && row.active !== '') {
     data.active = parseBoolean(row.active);
+  }
+
+  if (row.tax_code !== undefined && row.tax_code !== '') {
+    data.tax_code = row.tax_code;
   }
 
   // Extract metadata columns

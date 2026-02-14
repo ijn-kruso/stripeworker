@@ -5,11 +5,7 @@
 import { useState, useEffect } from 'react';
 import {
   Box,
-  Icon,
   Spinner,
-  Badge,
-  List,
-  ListItem,
 } from '@stripe/ui-extension-sdk/ui';
 import type { createApiClient, Job, JobListResponse } from '../api';
 
@@ -67,20 +63,14 @@ const JobProgress = ({ api }: JobProgressProps) => {
     return date.toLocaleString();
   };
 
-  const getStatusBadge = (status: Job['status']) => {
+  const getStatusText = (status: Job['status']) => {
     switch (status) {
-      case 'pending':
-        return <Badge type="info">Pending</Badge>;
-      case 'processing':
-        return <Badge type="warning">Processing</Badge>;
-      case 'completed':
-        return <Badge type="positive">Completed</Badge>;
-      case 'failed':
-        return <Badge type="negative">Failed</Badge>;
-      case 'cancelled':
-        return <Badge type="info">Cancelled</Badge>;
-      default:
-        return <Badge type="info">{status}</Badge>;
+      case 'pending': return '⏳ Pending';
+      case 'processing': return '🔄 Processing';
+      case 'completed': return '✓ Completed';
+      case 'failed': return '✗ Failed';
+      case 'cancelled': return '⊘ Cancelled';
+      default: return status;
     }
   };
 
@@ -93,76 +83,63 @@ const JobProgress = ({ api }: JobProgressProps) => {
     return (
       <Box css={{ stack: 'x', gap: 'small', alignY: 'center' }}>
         <Spinner size="small" />
-        <Box css={{ color: 'secondary' }}>Loading jobs...</Box>
+        <Box>Loading jobs...</Box>
       </Box>
     );
   }
 
   if (error) {
-    return (
-      <Box css={{ color: 'critical' }}>
-        Error: {error}
-      </Box>
-    );
+    return <Box>Error: {error}</Box>;
   }
 
   if (jobs.length === 0) {
-    return (
-      <Box css={{ color: 'secondary' }}>
-        No recent jobs. Start an export or import to see progress here.
-      </Box>
-    );
+    return <Box>No recent jobs. Start an export or import to see progress here.</Box>;
   }
 
   return (
-    <Box css={{ stack: 'y', gap: 'small' }}>
-      <List>
-        {jobs.map((job) => (
-          <ListItem
-            key={job.id}
-            id={job.id}
-            title={
-              <Box css={{ stack: 'x', gap: 'small', alignY: 'center' }}>
-                <Icon name={job.type === 'export' ? 'download' : 'upload'} />
-                <span>{job.type === 'export' ? 'Export' : 'Import'}</span>
-                {getStatusBadge(job.status)}
-              </Box>
-            }
-            secondaryTitle={formatDate(job.createdAt)}
-          >
-            <Box css={{ stack: 'y', gap: 'xsmall' }}>
-              {/* Progress info */}
-              <Box css={{ color: 'secondary', font: 'caption' }}>
-                {job.status === 'processing' ? (
-                  <Box css={{ stack: 'x', gap: 'xsmall', alignY: 'center' }}>
-                    <Spinner size="small" />
-                    <span>{getProgress(job)}% ({job.processedRows}/{job.totalRows} rows)</span>
-                  </Box>
-                ) : (
-                  <span>{job.processedRows} of {job.totalRows} rows</span>
-                )}
-              </Box>
-
-              {/* Import-specific stats */}
-              {job.type === 'import' && job.status === 'completed' && (
-                <Box css={{ color: 'secondary', font: 'caption' }}>
-                  Created: {job.createdCount ?? 0}, 
-                  Updated: {job.updatedCount ?? 0}, 
-                  Skipped: {job.skippedCount ?? 0}
-                  {job.dryRun && <Badge type="info">Dry Run</Badge>}
-                </Box>
-              )}
-
-              {/* Error count */}
-              {job.errorCount > 0 && (
-                <Box css={{ color: 'attention', font: 'caption' }}>
-                  {job.errorCount} errors
-                </Box>
-              )}
+    <Box css={{ stack: 'y', gap: 'medium' }}>
+      {jobs.map((job) => (
+        <Box key={job.id} css={{ stack: 'y', gap: 'xsmall', padding: 'small' }}>
+          {/* Job header */}
+          <Box css={{ stack: 'x', gap: 'small', alignY: 'center' }}>
+            <Box css={{ fontWeight: 'semibold' }}>
+              {job.type === 'export' ? 'Export' : 'Import'} - {getStatusText(job.status)}
             </Box>
-          </ListItem>
-        ))}
-      </List>
+          </Box>
+          
+          {/* Date */}
+          <Box css={{ font: 'caption' }}>
+            {formatDate(job.createdAt)}
+          </Box>
+
+          {/* Progress info */}
+          <Box css={{ font: 'caption' }}>
+            {job.status === 'processing' ? (
+              <Box css={{ stack: 'x', gap: 'xsmall', alignY: 'center' }}>
+                <Spinner size="small" />
+                <span>{getProgress(job)}% ({job.processedRows}/{job.totalRows} rows)</span>
+              </Box>
+            ) : (
+              <span>{job.processedRows} of {job.totalRows} rows</span>
+            )}
+          </Box>
+
+          {/* Import-specific stats */}
+          {job.type === 'import' && job.status === 'completed' && (
+            <Box css={{ font: 'caption' }}>
+              Created: {job.createdCount ?? 0}, Updated: {job.updatedCount ?? 0}, Skipped: {job.skippedCount ?? 0}
+              {job.dryRun && ' (Dry Run)'}
+            </Box>
+          )}
+
+          {/* Error count */}
+          {job.errorCount > 0 && (
+            <Box>
+              {job.errorCount} errors
+            </Box>
+          )}
+        </Box>
+      ))}
     </Box>
   );
 };

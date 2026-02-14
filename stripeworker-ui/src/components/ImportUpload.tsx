@@ -6,7 +6,6 @@ import { useState, useRef } from 'react';
 import {
   Box,
   Button,
-  Icon,
   Spinner,
   Banner,
   Checkbox,
@@ -147,11 +146,10 @@ const ImportUpload = ({ api }: ImportUploadProps) => {
         <Box css={{ stack: 'y', gap: 'small' }}>
           <Box css={{ stack: 'x', gap: 'small', alignY: 'center' }}>
             <Button type="secondary" onPress={handleFileSelect}>
-              <Icon name="document" />
-              <span>Select CSV File</span>
+              Select CSV File
             </Button>
             {selectedFile && (
-              <Box css={{ color: 'secondary' }}>
+              <Box>
                 {selectedFile.name} ({Math.round(selectedFile.size / 1024)} KB)
               </Box>
             )}
@@ -169,17 +167,7 @@ const ImportUpload = ({ api }: ImportUploadProps) => {
                 onPress={handleUpload}
                 disabled={isUploading}
               >
-                {isUploading ? (
-                  <Box css={{ stack: 'x', gap: 'xsmall', alignY: 'center' }}>
-                    <Spinner size="small" />
-                    <span>Uploading...</span>
-                  </Box>
-                ) : (
-                  <Box css={{ stack: 'x', gap: 'xsmall', alignY: 'center' }}>
-                    <Icon name="upload" />
-                    <span>{dryRun ? 'Preview Import' : 'Import Products'}</span>
-                  </Box>
-                )}
+                {isUploading ? 'Uploading...' : (dryRun ? 'Preview Import' : 'Import Products')}
               </Button>
             </Box>
           )}
@@ -197,7 +185,7 @@ const ImportUpload = ({ api }: ImportUploadProps) => {
           </Box>
           
           {currentJob.type === 'import' && (
-            <Box css={{ color: 'secondary', font: 'caption' }}>
+            <Box>
               Created: {currentJob.createdCount ?? 0} | 
               Updated: {currentJob.updatedCount ?? 0} | 
               Skipped: {currentJob.skippedCount ?? 0}

@@ -2,7 +2,7 @@
 import ProductListView from '../src/views/ProductListView';
 
 export * from '@stripe/ui-extension-sdk/version';
-export const BUILD_TIME = '2026-02-14 20:40:00.526044 +0100 CET m=+0.059735201';
+export const BUILD_TIME = '2026-02-14 21:36:42.6540874 +0100 CET m=+0.064810501';
 
 export { 
   ProductListView	
@@ -29,6 +29,13 @@ export default {
   },
   "stripe_api_access_type": "platform",
   "ui_extension": {
+    "content_security_policy": {
+      "connect-src": [
+        "http://localhost:8787/"
+      ],
+      "image-src": null,
+      "purpose": "Connect to local development backend for CSV import/export operations"
+    },
     "views": [
       {
         "component": "ProductListView",

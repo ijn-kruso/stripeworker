@@ -24,7 +24,13 @@
         "component": "ProductListView",
         "viewport": "stripe.dashboard.product.list"
       }
-    ]
+    ],
+    "content_security_policy": {
+      "connect-src": [
+        "http://localhost:8787/"
+      ],
+      "purpose": "Connect to local development backend for CSV import/export operations"
+    }
   },
   "version": "0.0.1"
 }

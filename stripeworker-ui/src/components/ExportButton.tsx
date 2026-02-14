@@ -6,7 +6,6 @@ import { useState } from 'react';
 import {
   Box,
   Button,
-  Icon,
   Spinner,
   Banner,
 } from '@stripe/ui-extension-sdk/ui';
@@ -103,7 +102,7 @@ const ExportButton = ({ api }: ExportButtonProps) => {
       {currentJob && currentJob.status === 'processing' && (
         <Box css={{ stack: 'x', gap: 'small', alignY: 'center' }}>
           <Spinner size="small" />
-          <Box css={{ color: 'secondary' }}>
+          <Box>
             Exporting {currentJob.processedRows} products...
           </Box>
         </Box>
@@ -127,17 +126,7 @@ const ExportButton = ({ api }: ExportButtonProps) => {
         onPress={handleExport}
         disabled={isExporting}
       >
-        {isExporting ? (
-          <Box css={{ stack: 'x', gap: 'xsmall', alignY: 'center' }}>
-            <Spinner size="small" />
-            <span>Exporting...</span>
-          </Box>
-        ) : (
-          <Box css={{ stack: 'x', gap: 'xsmall', alignY: 'center' }}>
-            <Icon name="download" />
-            <span>Export Products to CSV</span>
-          </Box>
-        )}
+        {isExporting ? 'Exporting...' : 'Export Products to CSV'}
       </Button>
     </Box>
   );
