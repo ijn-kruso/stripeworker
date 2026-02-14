@@ -12,6 +12,7 @@ import {
 } from '@stripe/ui-extension-sdk/ui';
 import type { ExtensionContextValue } from '@stripe/ui-extension-sdk/context';
 import { createApiClient, Job } from '../api';
+import ImportUpload from '../components/ImportUpload';
 
 const ProductListView = ({ userContext }: ExtensionContextValue) => {
   const [exportStatus, setExportStatus] = useState<string>('');
@@ -100,7 +101,7 @@ const ProductListView = ({ userContext }: ExtensionContextValue) => {
         <Box css={{ stack: 'y', gap: 'small' }}>
           <Box css={{ fontWeight: 'semibold' }}>Import Products</Box>
           <Box>Upload a CSV file to create or update products.</Box>
-          <Box>Coming soon - use Export first to get the CSV format.</Box>
+          <ImportUpload api={api} />
         </Box>
       </Box>
     </ContextView>
