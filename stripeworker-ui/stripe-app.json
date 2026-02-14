@@ -1,0 +1,30 @@
+{
+  "id": "com.example.stripeworker-csv",
+  "version": "0.0.1",
+  "name": "Product CSV Import/Export",
+  "icon": "./icon.png",
+  "permissions": [
+    {
+      "permission": "product_read",
+      "purpose": "Export products to CSV"
+    },
+    {
+      "permission": "product_write",
+      "purpose": "Import products from CSV"
+    }
+  ],
+  "stripe_api_access_type": "platform",
+  "ui_extension": {
+    "views": [
+      {
+        "viewport": "stripe.dashboard.product.list",
+        "component": "ProductListView"
+      }
+    ]
+  },
+  "allowed_redirect_uris": [],
+  "post_install_action": {
+    "type": "external",
+    "url": "https://github.com/your-org/stripeworker#readme"
+  }
+}

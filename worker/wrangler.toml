@@ -1,0 +1,21 @@
+name = "stripeworker"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+# Public environment variables
+
+# KV Namespace binding for job state storage
+[[kv_namespaces]]
+binding = "STRIPEWORKER_KV"
+id = "YOUR_KV_NAMESPACE_ID"
+preview_id = "YOUR_PREVIEW_KV_NAMESPACE_ID"
+
+# R2 Bucket binding for CSV file storage
+[[r2_buckets]]
+binding = "STRIPEWORKER_FILES"
+bucket_name = "stripeworker-files"
+
+# Secrets (set via wrangler secret put or .dev.vars)
+# STRIPE_SECRET_KEY - Platform's Stripe secret key
+# STRIPE_APP_SECRET - App signing secret for request verification
