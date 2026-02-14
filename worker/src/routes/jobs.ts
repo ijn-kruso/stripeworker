@@ -24,7 +24,10 @@ jobsRoutes.get('/', async (c) => {
     }
 
     const jobStore = createJobStore(c.env.STRIPEWORKER_KV);
-    const jobs = await jobStore.list(accountId, { type, status, limit });
+    const listOptions: { type?: 'import' | 'export'; status?: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled'; limit: number } = { limit };
+    if (type !== undefined) listOptions.type = type;
+    if (status !== undefined) listOptions.status = status;
+    const jobs = await jobStore.list(accountId, listOptions);
     
     return c.json({
       jobs: jobs.map(formatJobResponse),

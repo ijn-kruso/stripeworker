@@ -11,8 +11,6 @@ import {
   TextField,
   Spinner,
   Banner,
-  List,
-  ListItem,
 } from '@stripe/ui-extension-sdk/ui';
 import type { createApiClient } from '../api';
 
@@ -213,7 +211,7 @@ const FieldMapper = ({
             </Box>
             
             {newColumnMappings.map((mapping, index) => (
-              <Box key={index} css={{ stack: 'x', gap: 'small', alignY: 'end' }}>
+              <Box key={index} css={{ stack: 'x', gap: 'small', alignY: 'bottom' }}>
                 <Box css={{ width: 'fill' }}>
                   {csvHeaders.length > 0 ? (
                     <Select
@@ -276,7 +274,7 @@ const FieldMapper = ({
             </Button>
           </Box>
 
-          <Box css={{ stack: 'x', gap: 'small', distribute: 'end' }}>
+          <Box css={{ stack: 'x', gap: 'small', distribute: 'space-between' }}>
             <Button type="secondary" onPress={() => {
               setIsCreating(false);
               setNewMappingName('');

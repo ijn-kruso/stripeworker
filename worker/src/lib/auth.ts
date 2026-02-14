@@ -17,7 +17,7 @@ export interface AuthContext {
  * We verify using the app's signing secret.
  */
 export function stripeSignatureMiddleware() {
-  return async (c: Context, next: Next) => {
+  return async (c: Context, next: Next): Promise<Response | void> => {
     const appSecret = c.env.STRIPE_APP_SECRET;
     
     if (!appSecret) {
@@ -39,7 +39,7 @@ export function stripeSignatureMiddleware() {
       const stripe = new Stripe(c.env.STRIPE_SECRET_KEY);
       
       // The signature is verified against the raw body
-      const event = stripe.webhooks.constructEvent(body, signature, appSecret);
+      stripe.webhooks.constructEvent(body, signature, appSecret);
       
       // Parse JSON from the verified body
       const data = JSON.parse(body) as { user_id?: string; account_id?: string };
@@ -116,7 +116,7 @@ export function verifyStripeSignature(
 /**
  * Compute HMAC-SHA256 signature
  */
-async function computeHmacSha256Async(data: string, key: string): Promise<string> {
+export async function computeHmacSha256Async(data: string, key: string): Promise<string> {
   const encoder = new TextEncoder();
   const keyData = encoder.encode(key);
   const dataBuffer = encoder.encode(data);

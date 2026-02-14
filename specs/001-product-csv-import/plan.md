@@ -12,6 +12,7 @@ Build a Stripe App (UI extension embedded in Stripe Dashboard) enabling merchant
 ## Technical Context
 
 **Language/Version**: TypeScript (strict mode enabled)  
+**Package Manager**: Yarn  
 **Primary Dependencies**: Cloudflare Workers SDK, Stripe SDK, Stripe Apps UI Extension SDK, Hono (web framework)  
 **Storage**: Cloudflare KV (job state), Cloudflare R2 (CSV file storage)  
 **Testing**: Manual testing for MVP; automated tests added when stability is needed  

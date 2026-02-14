@@ -19,7 +19,7 @@ export interface ValidationError {
 /**
  * Validate a CSV row for import
  */
-export function validateCsvRow(row: ProductCsvRow, rowNumber: number): ValidationResult {
+export function validateCsvRow(row: ProductCsvRow, _rowNumber: number): ValidationResult {
   const errors: ValidationError[] = [];
   
   // Validate required fields

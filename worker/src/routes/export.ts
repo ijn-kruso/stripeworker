@@ -4,12 +4,11 @@
 
 import { Hono } from 'hono';
 import type { Env } from '../index';
-import { createJobStore, updateJobStatus, formatJobResponse } from '../services/jobs';
+import { createJobStore, formatJobResponse } from '../services/jobs';
 import { createJob } from '../models/job';
 import { createStorageService, generateFileKey } from '../services/storage';
 import { createStripeClient, fetchProductsBatch } from '../services/stripe';
 import { generateCsv } from '../services/csv';
-import { stripeProductToCsvRow, collectCsvHeaders } from '../models/product';
 import type Stripe from 'stripe';
 
 const exportRoutes = new Hono<{ Bindings: Env }>();
@@ -46,10 +45,11 @@ exportRoutes.post('/start', async (c) => {
     let hasMore = true;
 
     while (hasMore) {
-      const batch = await fetchProductsBatch(stripe, accountId, {
-        limit: 100,
-        startingAfter: cursor,
-      });
+      const fetchOptions: { limit: number; startingAfter?: string } = { limit: 100 };
+      if (cursor !== undefined) {
+        fetchOptions.startingAfter = cursor;
+      }
+      const batch = await fetchProductsBatch(stripe, accountId, fetchOptions);
       
       products.push(...batch.products);
       cursor = batch.nextCursor;

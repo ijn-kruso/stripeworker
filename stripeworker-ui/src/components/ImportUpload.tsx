@@ -147,7 +147,7 @@ const ImportUpload = ({ api }: ImportUploadProps) => {
         <Box css={{ stack: 'y', gap: 'small' }}>
           <Box css={{ stack: 'x', gap: 'small', alignY: 'center' }}>
             <Button type="secondary" onPress={handleFileSelect}>
-              <Icon name="file" />
+              <Icon name="document" />
               <span>Select CSV File</span>
             </Button>
             {selectedFile && (
@@ -213,7 +213,7 @@ const ImportUpload = ({ api }: ImportUploadProps) => {
       {/* Completion result */}
       {currentJob && currentJob.status === 'completed' && !isProcessing && (
         <Banner
-          type="positive"
+          type="default"
           title={dryRun ? 'Dry Run Complete' : 'Import Complete'}
           description={
             dryRun

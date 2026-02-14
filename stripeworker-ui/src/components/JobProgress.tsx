@@ -5,7 +5,6 @@
 import { useState, useEffect } from 'react';
 import {
   Box,
-  Button,
   Icon,
   Spinner,
   Badge,
@@ -156,7 +155,7 @@ const JobProgress = ({ api }: JobProgressProps) => {
 
               {/* Error count */}
               {job.errorCount > 0 && (
-                <Box css={{ color: 'warning', font: 'caption' }}>
+                <Box css={{ color: 'attention', font: 'caption' }}>
                   {job.errorCount} errors
                 </Box>
               )}

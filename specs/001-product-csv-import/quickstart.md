@@ -7,11 +7,11 @@
 ## Prerequisites
 
 - Node.js 18+ (LTS recommended)
-- pnpm (`npm install -g pnpm`)
+- Yarn (`npm install -g yarn`)
 - Cloudflare account (free tier works)
 - Stripe account with Apps enabled
 - Stripe CLI (`brew install stripe/stripe-cli/stripe` or [download](https://stripe.com/docs/stripe-cli))
-- Wrangler CLI (`pnpm add -g wrangler`)
+- Wrangler CLI (`yarn global add wrangler`)
 
 ## Project Setup
 
@@ -22,8 +22,8 @@ git clone <repository-url>
 cd stripeworker
 
 # Install dependencies for worker and Stripe App UI
-cd worker && pnpm install
-cd ../stripeworker-ui && pnpm install
+cd worker && yarn install
+cd ../stripeworker-ui && yarn install
 ```
 
 ### 2. Cloudflare Setup

@@ -117,14 +117,19 @@ export function toJobResponse(job: Job): JobResponse {
     errorCount: job.errors.length,
     createdAt: job.createdAt,
     updatedAt: job.updatedAt,
-    completedAt: job.completedAt,
   };
+
+  if (job.completedAt !== undefined) {
+    response.completedAt = job.completedAt;
+  }
 
   if (job.type === 'import') {
     response.createdCount = job.createdCount;
     response.updatedCount = job.updatedCount;
     response.skippedCount = job.skippedCount;
-    response.dryRun = job.options?.dryRun;
+    if (job.options?.dryRun !== undefined) {
+      response.dryRun = job.options.dryRun;
+    }
   }
 
   return response;

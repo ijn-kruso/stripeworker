@@ -4,15 +4,15 @@
 
 import { Hono } from 'hono';
 import type { Env } from '../index';
-import { createJobStore, updateJobStatus, incrementJobProgress, addJobError, formatJobResponse } from '../services/jobs';
-import { createJob, type Job, type JobError } from '../models/job';
+import { createJobStore, updateJobStatus, addJobError, formatJobResponse } from '../services/jobs';
+import { createJob, type Job } from '../models/job';
 import { createStorageService, generateFileKey } from '../services/storage';
 import { createStripeClient, createProduct, updateProduct, productExists } from '../services/stripe';
-import { parseCsv, countCsvRows, extractCsvRows, generateErrorCsv } from '../services/csv';
+import { countCsvRows, extractCsvRows, generateErrorCsv } from '../services/csv';
 import { validateBatch } from '../lib/validation';
 import { applyMappingToBatch } from '../lib/mapping';
 import type { FieldMapping } from '../models/mapping';
-import type { ProductCsvRow, ProductData } from '../models/product';
+import type { ProductData } from '../models/product';
 import type Stripe from 'stripe';
 
 const importRoutes = new Hono<{ Bindings: Env }>();
@@ -122,8 +122,10 @@ importRoutes.post('/:jobId/start', async (c) => {
     job.options = {
       dryRun: body.dryRun ?? false,
       skipInvalidRows: true,
-      mappingId: body.mappingId,
     };
+    if (body.mappingId !== undefined) {
+      job.options.mappingId = body.mappingId;
+    }
     job.status = 'processing';
     job.cursor = '1'; // Start at row 1 (after header)
     await jobStore.save(job);
@@ -171,7 +173,7 @@ importRoutes.post('/:jobId/process', async (c) => {
 
     // Extract rows for this chunk
     const startRow = parseInt(job.cursor ?? '1', 10);
-    const { headers, rows, hasMore } = extractCsvRows(content, startRow, batchSize);
+    const { rows, hasMore } = extractCsvRows(content, startRow, batchSize);
 
     if (rows.length === 0) {
       // No more rows to process
@@ -194,11 +196,16 @@ importRoutes.post('/:jobId/process', async (c) => {
 
     // Track errors for invalid rows
     for (const invalid of validation.invalidRows) {
-      addJobError(job, {
+      const errorInfo: { message: string; field?: string; value?: string } = {
         message: invalid.errors.map(e => `${e.field}: ${e.message}`).join('; '),
-        field: invalid.errors[0]?.field,
-        value: invalid.errors[0]?.value,
-      }, invalid.rowNumber);
+      };
+      if (invalid.errors[0]?.field !== undefined) {
+        errorInfo.field = invalid.errors[0].field;
+      }
+      if (invalid.errors[0]?.value !== undefined) {
+        errorInfo.value = invalid.errors[0].value;
+      }
+      addJobError(job, errorInfo, invalid.rowNumber);
       job.skippedCount++;
     }
 
@@ -257,29 +264,30 @@ async function processProductRow(
   accountId: string,
   data: ProductData
 ): Promise<{ created: boolean }> {
+  // Build params with only defined values
+  const params: Stripe.ProductCreateParams = { name: data.name };
+  if (data.description !== undefined) params.description = data.description;
+  if (data.active !== undefined) params.active = data.active;
+  if (data.metadata !== undefined) params.metadata = data.metadata;
+  if (data.images !== undefined) params.images = data.images;
+
   if (data.id) {
     // Update existing product
     const exists = await productExists(stripe, accountId, data.id);
     if (exists) {
-      await updateProduct(stripe, accountId, data.id, {
-        name: data.name,
-        description: data.description,
-        active: data.active,
-        metadata: data.metadata,
-        images: data.images,
-      });
+      const updateParams: Stripe.ProductUpdateParams = { name: data.name };
+      if (data.description !== undefined) updateParams.description = data.description;
+      if (data.active !== undefined) updateParams.active = data.active;
+      if (data.metadata !== undefined) updateParams.metadata = data.metadata;
+      if (data.images !== undefined) updateParams.images = data.images;
+      
+      await updateProduct(stripe, accountId, data.id, updateParams);
       return { created: false };
     }
   }
   
   // Create new product
-  await createProduct(stripe, accountId, {
-    name: data.name,
-    description: data.description,
-    active: data.active,
-    metadata: data.metadata,
-    images: data.images,
-  });
+  await createProduct(stripe, accountId, params);
   return { created: true };
 }
 

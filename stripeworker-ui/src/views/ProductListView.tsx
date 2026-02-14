@@ -4,10 +4,8 @@
 
 import {
   Box,
-  Button,
   ContextView,
   Divider,
-  Inline,
   Spinner,
 } from '@stripe/ui-extension-sdk/ui';
 import type { ExtensionContextValue } from '@stripe/ui-extension-sdk/context';
@@ -22,7 +20,7 @@ interface ProductListViewProps {
   environment: ExtensionContextValue['environment'];
 }
 
-const ProductListView = ({ userContext, environment }: ProductListViewProps) => {
+const ProductListView = ({ userContext, environment: _environment }: ProductListViewProps) => {
   // Ensure we have required context
   if (!userContext?.id || !userContext?.account?.id) {
     return (

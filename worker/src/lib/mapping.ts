@@ -2,7 +2,7 @@
  * Field mapping application during CSV parsing
  */
 
-import type { FieldMapping, ColumnMapping, TransformRule } from '../models/mapping';
+import type { FieldMapping, TransformRule } from '../models/mapping';
 import type { ProductCsvRow } from '../models/product';
 
 /**

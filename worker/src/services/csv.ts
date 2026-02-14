@@ -8,8 +8,6 @@ import {
   collectCsvHeaders, 
   type ProductCsvRow,
   STANDARD_COLUMNS,
-  METADATA_PREFIX,
-  IMAGE_PREFIX,
 } from '../models/product';
 
 // UTF-8 BOM for Excel compatibility

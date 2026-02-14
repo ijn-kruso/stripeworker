@@ -83,15 +83,16 @@ export async function* paginateProducts(
   let hasMore = true;
 
   while (hasMore) {
+    const listParams: Stripe.ProductListParams = {
+      limit,
+      expand: ['data.default_price'],
+    };
+    if (startingAfter !== undefined) {
+      listParams.starting_after = startingAfter;
+    }
+    
     const response = await withRateLimitRetry(() =>
-      stripe.products.list(
-        {
-          limit,
-          starting_after: startingAfter,
-          expand: ['data.default_price'],
-        },
-        { stripeAccount: accountId }
-      )
+      stripe.products.list(listParams, { stripeAccount: accountId })
     );
 
     for (const product of response.data) {
@@ -115,25 +116,25 @@ export async function fetchProductsBatch(
 ): Promise<{ products: Stripe.Product[]; nextCursor?: string; hasMore: boolean }> {
   const limit = options.limit ?? 100;
 
+  const listParams: Stripe.ProductListParams = { limit };
+  if (options.startingAfter !== undefined) {
+    listParams.starting_after = options.startingAfter;
+  }
+
   const response = await withRateLimitRetry(() =>
-    stripe.products.list(
-      {
-        limit,
-        starting_after: options.startingAfter,
-      },
-      { stripeAccount: accountId }
-    )
+    stripe.products.list(listParams, { stripeAccount: accountId })
   );
 
-  const nextCursor = response.has_more && response.data.length > 0
-    ? response.data[response.data.length - 1].id
-    : undefined;
-
-  return {
+  const result: { products: Stripe.Product[]; nextCursor?: string; hasMore: boolean } = {
     products: response.data,
-    nextCursor,
     hasMore: response.has_more,
   };
+
+  if (response.has_more && response.data.length > 0) {
+    result.nextCursor = response.data[response.data.length - 1].id;
+  }
+
+  return result;
 }
 
 /**

@@ -37,11 +37,13 @@ export function createJobStore(kv: KVNamespace): JobStore {
       job.updatedAt = new Date().toISOString();
       
       // Set TTL only for completed/failed/cancelled jobs
-      const expirationTtl = ['completed', 'failed', 'cancelled'].includes(job.status)
-        ? JOB_TTL_SECONDS
-        : undefined;
+      const shouldExpire = ['completed', 'failed', 'cancelled'].includes(job.status);
 
-      await kv.put(key, JSON.stringify(job), { expirationTtl });
+      if (shouldExpire) {
+        await kv.put(key, JSON.stringify(job), { expirationTtl: JOB_TTL_SECONDS });
+      } else {
+        await kv.put(key, JSON.stringify(job));
+      }
 
       // Also store in account's job list for lookup
       await updateAccountJobsList(kv, job);
