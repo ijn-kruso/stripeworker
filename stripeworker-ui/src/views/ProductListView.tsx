@@ -9,12 +9,17 @@ import {
   ContextView,
   Button,
   Link,
+  Icon,
 } from '@stripe/ui-extension-sdk/ui';
 import type { ExtensionContextValue } from '@stripe/ui-extension-sdk/context';
 import { createApiClient, Job } from '../api';
 import ImportUpload from '../components/ImportUpload';
+import brandIcon from '../icon.svg';
+
+type ViewState = 'home' | 'products';
 
 const ProductListView = ({ userContext }: ExtensionContextValue) => {
+  const [viewState, setViewState] = useState<ViewState>('home');
   const [exportStatus, setExportStatus] = useState<string>('');
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -22,7 +27,11 @@ const ProductListView = ({ userContext }: ExtensionContextValue) => {
   // Check for required context
   if (!userContext?.id || !userContext?.account?.id) {
     return (
-      <ContextView title="Product CSV Tools">
+      <ContextView 
+        title="Products" 
+        brandColor="#635bff" 
+        brandIcon={brandIcon}
+      >
         <Box css={{ padding: 'medium' }}>
           Loading...
         </Box>
@@ -70,9 +79,37 @@ const ProductListView = ({ userContext }: ExtensionContextValue) => {
     }
   }, [api]);
 
+  // Home view - select resource type
+  if (viewState === 'home') {
+    return (
+      <ContextView 
+        title="Stripeworker" 
+        description="Import and export Stripe resources to and from CSV"
+        brandColor="#635bff" 
+        brandIcon={brandIcon}
+      >
+        <Box css={{ padding: 'medium', stack: 'y', gap: 'medium' }}>
+          <Box css={{ fontWeight: 'semibold' }}>Select Resource Type</Box>
+          <Button type="primary" onPress={() => setViewState('products')}>
+            <Icon name="product" size="xsmall" /> Products
+          </Button>
+        </Box>
+      </ContextView>
+    );
+  }
+
+  // Products view - import/export products
   return (
-    <ContextView title="Product CSV Import/Export">
+    <ContextView 
+      title="Products" 
+      description="Import and export products to and from CSV"
+      brandColor="#635bff" 
+      brandIcon={brandIcon}
+    >
       <Box css={{ padding: 'medium', stack: 'y', gap: 'large' }}>
+        <Link type="secondary" onPress={() => setViewState('home')}>
+          <Icon name="arrowLeft" size="xsmall" /> Back
+        </Link>
         <Box css={{ stack: 'y', gap: 'small' }}>
           <Box css={{ fontWeight: 'semibold' }}>Export Products</Box>
           <Box>Download all your products as a CSV file.</Box>

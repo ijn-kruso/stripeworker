@@ -1,8 +1,8 @@
 {
   "connect_permissions": null,
-  "icon": "./icon.png",
+  "icon": "./src/icon.svg",
   "id": "com.example.stripeworker-csv",
-  "name": "Product CSV Import-Export",
+  "name": "Stripeworker",
   "permissions": [
     {
       "permission": "product_read",

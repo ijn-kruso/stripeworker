@@ -2,7 +2,7 @@
 import ProductListView from '../src/views/ProductListView';
 
 export * from '@stripe/ui-extension-sdk/version';
-export const BUILD_TIME = '2026-02-15 10:54:21.324491 +0100 CET m=+0.064277001';
+export const BUILD_TIME = '2026-02-15 11:35:09.911246 +0100 CET m=+0.068524501';
 
 export { 
   ProductListView	
@@ -10,9 +10,9 @@ export {
 
 export default {
   "connect_permissions": null,
-  "icon": "./icon.png",
+  "icon": "./src/icon.svg",
   "id": "com.example.stripeworker-csv",
-  "name": "Product CSV Import-Export",
+  "name": "Stripeworker",
   "permissions": [
     {
       "permission": "product_read",
