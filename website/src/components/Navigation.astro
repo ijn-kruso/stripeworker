@@ -1,0 +1,64 @@
+---
+const marketplaceUrl = 'https://marketplace.stripe.com/apps/stripeworker';
+---
+
+<nav class="navigation">
+  <div class="container nav-container">
+    <a href="/" class="logo">
+      <svg class="logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" rx="8" fill="currentColor"/>
+        <path d="M10 16L14 20L22 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="logo-text">StripeWorker</span>
+    </a>
+    <a href={marketplaceUrl} class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+      Get Started
+    </a>
+  </div>
+</nav>
+
+<style>
+  .navigation {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-4) 0;
+  }
+  
+  .nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: var(--font-size-xl);
+    text-decoration: none;
+  }
+  
+  .logo:hover {
+    color: var(--color-primary-dark);
+  }
+  
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .logo-text {
+    color: var(--color-secondary);
+  }
+  
+  @media (max-width: 480px) {
+    .logo-text {
+      display: none;
+    }
+  }
+</style>

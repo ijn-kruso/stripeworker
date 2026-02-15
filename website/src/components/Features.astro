@@ -1,0 +1,165 @@
+---
+const features = [
+  {
+    icon: 'download',
+    title: 'CSV Export',
+    description: 'Export your entire product catalog to CSV with one click. Download all products, prices, and metadata instantly.'
+  },
+  {
+    icon: 'upload',
+    title: 'Bulk Import',
+    description: 'Upload edited CSVs to update thousands of products at once. No more manual updates one by one.'
+  },
+  {
+    icon: 'mapping',
+    title: 'Field Mapping',
+    description: 'Map CSV columns to Stripe fields with saved templates. Create reusable mappings for different CSV formats.'
+  },
+  {
+    icon: 'preview',
+    title: 'Dry Run Preview',
+    description: 'Preview all changes before applying them. See exactly what will be created, updated, or unchanged.'
+  },
+  {
+    icon: 'scale',
+    title: '100k+ Scale',
+    description: 'Handle massive product catalogs efficiently. Built for enterprise-scale operations with background processing.'
+  }
+];
+---
+
+<section class="features section">
+  <div class="container">
+    <div class="features-header text-center">
+      <h2>Everything You Need for Bulk Product Management</h2>
+      <p class="features-subtitle">
+        Powerful tools to manage your Stripe product catalog at scale
+      </p>
+    </div>
+    <div class="features-grid">
+      {features.map((feature) => (
+        <div class="feature-card">
+          <div class="feature-icon">
+            {feature.icon === 'download' && (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+            )}
+            {feature.icon === 'upload' && (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            )}
+            {feature.icon === 'mapping' && (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+              </svg>
+            )}
+            {feature.icon === 'preview' && (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            )}
+            {feature.icon === 'scale' && (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="20" x2="12" y2="10"></line>
+                <line x1="18" y1="20" x2="18" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="16"></line>
+              </svg>
+            )}
+          </div>
+          <h3 class="feature-title">{feature.title}</h3>
+          <p class="feature-description">{feature.description}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .features-header {
+    margin-bottom: var(--space-12);
+  }
+  
+  .features-header h2 {
+    margin-bottom: var(--space-4);
+  }
+  
+  .features-subtitle {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-light);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+  }
+  
+  .feature-card {
+    padding: var(--space-8);
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    transition: all var(--transition-base);
+  }
+  
+  .feature-card:hover {
+    border-color: var(--color-primary-light);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+  }
+  
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    padding: var(--space-3);
+    background: var(--color-background-alt);
+    border-radius: var(--radius-md);
+    color: var(--color-primary);
+    margin-bottom: var(--space-4);
+  }
+  
+  .feature-icon :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .feature-title {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-3);
+  }
+  
+  .feature-description {
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+  
+  @media (max-width: 900px) {
+    .features-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .feature-card {
+      padding: var(--space-6);
+    }
+  }
+</style>

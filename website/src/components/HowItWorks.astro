@@ -1,0 +1,134 @@
+---
+const steps = [
+  {
+    number: 1,
+    title: 'Export',
+    description: 'Download your Stripe products as a CSV file with all fields and metadata.'
+  },
+  {
+    number: 2,
+    title: 'Edit',
+    description: 'Make bulk changes in Excel, Google Sheets, or any spreadsheet app you prefer.'
+  },
+  {
+    number: 3,
+    title: 'Import',
+    description: 'Upload your edited CSV and preview changes before applying them to Stripe.'
+  }
+];
+---
+
+<section class="how-it-works section section-alt">
+  <div class="container">
+    <div class="how-it-works-header text-center">
+      <h2>How It Works</h2>
+      <p class="how-it-works-subtitle">
+        Three simple steps to bulk edit your Stripe products
+      </p>
+    </div>
+    <div class="steps">
+      {steps.map((step, index) => (
+        <div class="step">
+          <div class="step-number">{step.number}</div>
+          <h3 class="step-title">{step.title}</h3>
+          <p class="step-description">{step.description}</p>
+          {index < steps.length - 1 && (
+            <div class="step-connector">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .how-it-works-header {
+    margin-bottom: var(--space-12);
+  }
+  
+  .how-it-works-header h2 {
+    margin-bottom: var(--space-4);
+  }
+  
+  .how-it-works-subtitle {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-light);
+  }
+  
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-8);
+    position: relative;
+  }
+  
+  .step {
+    text-align: center;
+    padding: var(--space-8);
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    position: relative;
+    box-shadow: var(--shadow-md);
+  }
+  
+  .step-number {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    color: var(--color-white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    margin: 0 auto var(--space-6);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .step-title {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--space-3);
+  }
+  
+  .step-description {
+    color: var(--color-text);
+    line-height: 1.6;
+  }
+  
+  .step-connector {
+    display: none;
+    position: absolute;
+    right: -32px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    color: var(--color-primary);
+    z-index: 1;
+  }
+  
+  @media (min-width: 901px) {
+    .step-connector {
+      display: block;
+    }
+  }
+  
+  @media (max-width: 900px) {
+    .steps {
+      grid-template-columns: 1fr;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+</style>

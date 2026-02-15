@@ -1,0 +1,198 @@
+---
+const marketplaceUrl = 'https://marketplace.stripe.com/apps/stripeworker';
+---
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <h1 class="hero-headline">Bulk Edit Your Stripe Products</h1>
+      <p class="hero-subheadline">
+        Export to CSV, edit 100k+ products, and import back with custom field mappings. 
+        The easiest way to manage Stripe products at scale.
+      </p>
+      <div class="hero-cta">
+        <a href={marketplaceUrl} class="btn btn-primary btn-lg" target="_blank" rel="noopener noreferrer">
+          Install from Stripe Marketplace
+          <svg class="arrow-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </a>
+        <p class="hero-note">Free to install • Works with your existing Stripe account</p>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="csv-preview">
+        <div class="csv-header">
+          <span class="csv-dot"></span>
+          <span class="csv-dot"></span>
+          <span class="csv-dot"></span>
+          <span class="csv-title">products.csv</span>
+        </div>
+        <div class="csv-content">
+          <div class="csv-row csv-row-header">
+            <span>name</span>
+            <span>price</span>
+            <span>currency</span>
+          </div>
+          <div class="csv-row">
+            <span>Product A</span>
+            <span>29.99</span>
+            <span>USD</span>
+          </div>
+          <div class="csv-row">
+            <span>Product B</span>
+            <span>49.99</span>
+            <span>USD</span>
+          </div>
+          <div class="csv-row">
+            <span>Product C</span>
+            <span>99.99</span>
+            <span>USD</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding: var(--space-16) 0 var(--space-24);
+    background: linear-gradient(180deg, var(--color-background-alt) 0%, var(--color-background) 100%);
+  }
+  
+  .hero .container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+    align-items: center;
+  }
+  
+  .hero-headline {
+    font-size: var(--font-size-5xl);
+    margin-bottom: var(--space-6);
+    line-height: 1.1;
+  }
+  
+  .hero-subheadline {
+    font-size: var(--font-size-xl);
+    color: var(--color-text);
+    margin-bottom: var(--space-8);
+    line-height: 1.6;
+  }
+  
+  .hero-cta .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  
+  .arrow-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform var(--transition-fast);
+  }
+  
+  .hero-cta .btn:hover .arrow-icon {
+    transform: translateX(4px);
+  }
+  
+  .hero-note {
+    margin-top: var(--space-4);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-light);
+  }
+  
+  .hero-visual {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .csv-preview {
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    overflow: hidden;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .csv-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-secondary);
+  }
+  
+  .csv-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-text-light);
+  }
+  
+  .csv-dot:nth-child(1) { background: #ff5f57; }
+  .csv-dot:nth-child(2) { background: #ffbd2e; }
+  .csv-dot:nth-child(3) { background: #28ca42; }
+  
+  .csv-title {
+    margin-left: var(--space-3);
+    color: var(--color-white);
+    font-size: var(--font-size-sm);
+    font-family: monospace;
+  }
+  
+  .csv-content {
+    padding: var(--space-4);
+  }
+  
+  .csv-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: var(--space-4);
+    padding: var(--space-2) var(--space-3);
+    font-family: monospace;
+    font-size: var(--font-size-sm);
+    border-radius: var(--radius-sm);
+  }
+  
+  .csv-row:not(:last-child) {
+    border-bottom: 1px solid var(--color-border);
+  }
+  
+  .csv-row-header {
+    font-weight: 600;
+    color: var(--color-secondary);
+    background: var(--color-background-alt);
+  }
+  
+  @media (max-width: 900px) {
+    .hero .container {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    
+    .hero-visual {
+      order: -1;
+    }
+    
+    .csv-preview {
+      max-width: 350px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .hero {
+      padding: var(--space-10) 0 var(--space-16);
+    }
+    
+    .hero-headline {
+      font-size: var(--font-size-3xl);
+    }
+    
+    .hero-subheadline {
+      font-size: var(--font-size-base);
+    }
+  }
+</style>
