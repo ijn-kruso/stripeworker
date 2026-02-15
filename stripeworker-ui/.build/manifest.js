@@ -2,7 +2,7 @@
 import ProductListView from '../src/views/ProductListView';
 
 export * from '@stripe/ui-extension-sdk/version';
-export const BUILD_TIME = '2026-02-15 16:05:34.2310028 +0100 CET m=+5.020100101';
+export const BUILD_TIME = '2026-02-15 16:43:16.4520209 +0100 CET m=+6.164173601';
 
 export { 
   ProductListView	
@@ -56,5 +56,5 @@ export default {
       }
     ]
   },
-  "version": "1.0.2"
+  "version": "1.0.3"
 };
