@@ -115,6 +115,23 @@ export function createApiClient(options: ApiClientOptions) {
         throw new ApiError(response.status, 'File upload failed');
       }
     },
+
+    /**
+     * Upload CSV text content to a presigned URL
+     */
+    async uploadCsvContent(uploadUrl: string, content: string): Promise<void> {
+      const response = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'text/csv',
+        },
+        body: content,
+      });
+
+      if (!response.ok) {
+        throw new ApiError(response.status, 'CSV upload failed');
+      }
+    },
   };
 }
 
@@ -143,6 +160,7 @@ export interface Job {
   skippedCount?: number;
   errorCount: number;
   dryRun?: boolean;
+  inputFileKey?: string;
   createdAt: string;
   updatedAt: string;
   completedAt?: string;

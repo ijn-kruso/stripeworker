@@ -18,7 +18,152 @@ import type Stripe from 'stripe';
 const importRoutes = new Hono<{ Bindings: Env }>();
 
 /**
- * POST /import/upload-url - Get presigned URL for CSV upload
+ * POST /import/from-stripe-file - Start import from a Stripe Files API file
+ * This is the primary import method - file is uploaded via StripeFileUploader in the UI
+ */
+importRoutes.post('/from-stripe-file', async (c) => {
+  try {
+    const body = await c.req.json<{
+      user_id: string;
+      account_id: string;
+      fileId: string; // Stripe file ID (file_xxx)
+      dryRun?: boolean;
+      mappingId?: string;
+    }>();
+    const { account_id: accountId, fileId, dryRun, mappingId } = body;
+
+    if (!accountId) {
+      return c.json({ error: 'Missing account_id' }, 400);
+    }
+
+    if (!fileId) {
+      return c.json({ error: 'Missing fileId' }, 400);
+    }
+
+    const jobStore = createJobStore(c.env.STRIPEWORKER_KV);
+    const storage = createStorageService(
+      c.env.STRIPEWORKER_FILES,
+      new URL(c.req.url).origin
+    );
+    const stripe = createStripeClient({ secretKey: c.env.STRIPE_SECRET_KEY, accountId });
+
+    // Create import job
+    const job = createJob('import', accountId);
+    job.options = {
+      dryRun: dryRun ?? false,
+      skipInvalidRows: true,
+    };
+    if (mappingId) {
+      job.options.mappingId = mappingId;
+    }
+    await jobStore.save(job);
+
+    try {
+      // Fetch file content from Stripe Files API (on connected account)
+      const file = await stripe.files.retrieve(fileId, { stripeAccount: accountId });
+      
+      if (!file.url) {
+        return c.json({ error: 'File has no download URL' }, 400);
+      }
+
+      // Download file content using Stripe-Account header for connected account
+      const fileResponse = await fetch(file.url, {
+        headers: {
+          'Authorization': `Bearer ${c.env.STRIPE_SECRET_KEY}`,
+          'Stripe-Account': accountId,
+        },
+      });
+
+      if (!fileResponse.ok) {
+        return c.json({ error: 'Failed to download file from Stripe' }, 500);
+      }
+
+      const csvContent = await fileResponse.text();
+
+      // Store in R2 for chunked processing
+      const fileKey = generateFileKey(accountId, job.id, file.filename || 'import.csv');
+      await storage.putFile(fileKey, csvContent);
+
+      // Update job with file info
+      job.inputFileKey = fileKey;
+      job.totalRows = countCsvRows(csvContent);
+      job.status = 'processing';
+      job.cursor = '1';
+      await jobStore.save(job);
+
+      return c.json(formatJobResponse(job), 202);
+    } catch (stripeErr) {
+      console.error('Stripe file fetch error:', stripeErr);
+      job.status = 'failed';
+      addJobError(job, { message: 'Failed to fetch file from Stripe' });
+      await jobStore.save(job);
+      return c.json({ error: 'Failed to fetch file from Stripe' }, 500);
+    }
+  } catch (err) {
+    console.error('Import from Stripe file error:', err);
+    return c.json({ error: 'Failed to start import' }, 500);
+  }
+});
+
+/**
+ * POST /import/from-csv-content - Start import from CSV content sent directly
+ * This is the primary import method for textarea-based upload
+ */
+importRoutes.post('/from-csv-content', async (c) => {
+  try {
+    const body = await c.req.json<{
+      user_id: string;
+      account_id: string;
+      csvContent: string;
+      dryRun?: boolean;
+      mappingId?: string;
+    }>();
+    const { account_id: accountId, csvContent, dryRun, mappingId } = body;
+
+    if (!accountId) {
+      return c.json({ error: 'Missing account_id' }, 400);
+    }
+
+    if (!csvContent || !csvContent.trim()) {
+      return c.json({ error: 'Missing csvContent' }, 400);
+    }
+
+    const jobStore = createJobStore(c.env.STRIPEWORKER_KV);
+    const storage = createStorageService(
+      c.env.STRIPEWORKER_FILES,
+      new URL(c.req.url).origin
+    );
+
+    // Create import job
+    const job = createJob('import', accountId);
+    job.options = {
+      dryRun: dryRun ?? false,
+      skipInvalidRows: true,
+    };
+    if (mappingId) {
+      job.options.mappingId = mappingId;
+    }
+
+    // Store CSV content in R2
+    const fileKey = generateFileKey(accountId, job.id, 'import.csv');
+    await storage.putFile(fileKey, csvContent);
+
+    // Update job with file info
+    job.inputFileKey = fileKey;
+    job.totalRows = countCsvRows(csvContent);
+    job.status = 'processing';
+    job.cursor = '1';
+    await jobStore.save(job);
+
+    return c.json(formatJobResponse(job), 202);
+  } catch (err) {
+    console.error('Import from CSV content error:', err);
+    return c.json({ error: 'Failed to start import' }, 500);
+  }
+});
+
+/**
+ * POST /import/upload-url - Get presigned URL for CSV upload (legacy/alternative method)
  */
 importRoutes.post('/upload-url', async (c) => {
   try {
@@ -27,8 +172,9 @@ importRoutes.post('/upload-url', async (c) => {
       account_id: string;
       filename: string;
       contentType?: string;
+      jobId?: string; // Optional: use existing job from upload-page flow
     }>();
-    const { account_id: accountId, filename } = body;
+    const { account_id: accountId, filename, jobId: existingJobId } = body;
     
     if (!accountId) {
       return c.json({ error: 'Missing account_id' }, 400);
@@ -44,12 +190,23 @@ importRoutes.post('/upload-url', async (c) => {
       new URL(c.req.url).origin
     );
 
-    // Create new import job in pending state
-    const job = createJob('import', accountId);
-    await jobStore.save(job);
+    // Use existing job if provided, otherwise create new one
+    let job;
+    if (existingJobId) {
+      job = await jobStore.get(existingJobId);
+      if (!job) {
+        return c.json({ error: 'Job not found' }, 404);
+      }
+      if (job.status !== 'pending') {
+        return c.json({ error: 'Job already started' }, 409);
+      }
+    } else {
+      job = createJob('import', accountId);
+      await jobStore.save(job);
+    }
 
     // Generate file key
-    const fileKey = generateFileKey(accountId, job.id, filename);
+    const fileKey = generateFileKey(job.stripeAccountId, job.id, filename);
     job.inputFileKey = fileKey;
     await jobStore.save(job);
 
@@ -228,10 +385,18 @@ importRoutes.post('/:jobId/process', async (c) => {
         }
       }
     } else {
-      // Dry run - just count what would happen
+      // Dry run - check what would happen (must verify existence like actual run)
+      const stripe = createStripeClient({ secretKey: c.env.STRIPE_SECRET_KEY });
+      
       for (const valid of validation.validRows) {
         if (valid.data.id) {
-          job.updatedCount++;
+          // Check if product actually exists in Stripe
+          const exists = await productExists(stripe, job.stripeAccountId, valid.data.id);
+          if (exists) {
+            job.updatedCount++;
+          } else {
+            job.createdCount++;
+          }
         } else {
           job.createdCount++;
         }

@@ -119,6 +119,10 @@ function csvRowToProductData(row: ProductCsvRow): ProductData {
     data.active = ['true', '1', 'yes'].includes(active);
   }
   
+  if (row.tax_code !== undefined && row.tax_code.trim() !== '') {
+    data.tax_code = row.tax_code.trim();
+  }
+  
   // Extract metadata
   const metadata: Record<string, string> = {};
   for (const [key, value] of Object.entries(row)) {

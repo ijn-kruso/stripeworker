@@ -1,73 +1,57 @@
 /**
- * ImportUpload component - file selection and upload for CSV import
+ * ImportUpload component - CSV import via text paste (Stripe Apps compatible)
  */
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Button,
   Spinner,
   Banner,
   Checkbox,
+  TextArea,
 } from '@stripe/ui-extension-sdk/ui';
-import type { createApiClient, Job, UploadUrlResponse } from '../api';
+import type { createApiClient, Job } from '../api';
 
 interface ImportUploadProps {
   api: ReturnType<typeof createApiClient>;
 }
 
 const ImportUpload = ({ api }: ImportUploadProps) => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [csvContent, setCsvContent] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentJob, setCurrentJob] = useState<Job | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dryRun, setDryRun] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileSelect = () => {
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (event: Event) => {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) {
-      if (!file.name.toLowerCase().endsWith('.csv')) {
-        setError('Please select a CSV file');
-        return;
-      }
-      setSelectedFile(file);
-      setError(null);
-      setCurrentJob(null);
-    }
-  };
 
   const handleUpload = async () => {
-    if (!selectedFile) return;
+    if (!csvContent.trim()) {
+      setError('Please paste CSV content');
+      return;
+    }
+
+    // Basic validation: check for header row
+    const lines = csvContent.trim().split('\n');
+    if (lines.length < 2) {
+      setError('CSV must have a header row and at least one data row');
+      return;
+    }
 
     setIsUploading(true);
     setError(null);
 
     try {
-      // Step 1: Get presigned upload URL
-      const uploadResponse = await api.post<UploadUrlResponse>('/import/upload-url', {
-        filename: selectedFile.name,
-        contentType: selectedFile.type || 'text/csv',
-      });
-
-      // Step 2: Upload file to presigned URL
-      await api.uploadFile(uploadResponse.uploadUrl, selectedFile);
-
-      // Step 3: Start import job
-      setIsProcessing(true);
-      const job = await api.post<Job>(`/import/${uploadResponse.jobId}/start`, {
+      // Start import with CSV content sent directly to backend
+      const job = await api.post<Job>('/import/from-csv-content', {
+        csvContent,
         dryRun,
       });
       setCurrentJob(job);
+      setIsProcessing(true);
 
-      // Step 4: Poll for chunk processing
-      await processChunks(uploadResponse.jobId);
+      // Poll for chunk processing
+      await processChunks(job.id);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed');
     } finally {
@@ -77,12 +61,11 @@ const ImportUpload = ({ api }: ImportUploadProps) => {
   };
 
   const processChunks = async (jobId: string) => {
-    const maxAttempts = 600; // 30 minutes max (at 3 second intervals)
+    const maxAttempts = 600;
     let attempts = 0;
 
     while (attempts < maxAttempts) {
       try {
-        // Process next chunk
         const job = await api.post<Job>(`/import/${jobId}/process`, {
           batchSize: 100,
         });
@@ -92,7 +75,6 @@ const ImportUpload = ({ api }: ImportUploadProps) => {
           return;
         }
 
-        // Brief pause between chunks
         await new Promise(resolve => setTimeout(resolve, 100));
       } catch (err) {
         console.error('Chunk processing error:', err);
@@ -116,22 +98,25 @@ const ImportUpload = ({ api }: ImportUploadProps) => {
     }
   };
 
+  const handleReset = () => {
+    setCsvContent('');
+    setCurrentJob(null);
+    setError(null);
+    setDryRun(false);
+  };
+
   const getProgress = () => {
     if (!currentJob || currentJob.totalRows === 0) return 0;
     return Math.round((currentJob.processedRows / currentJob.totalRows) * 100);
   };
 
+  const getRowCount = () => {
+    if (!csvContent.trim()) return 0;
+    return Math.max(0, csvContent.trim().split('\n').length - 1);
+  };
+
   return (
     <Box css={{ stack: 'y', gap: 'small' }}>
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".csv"
-        style={{ display: 'none' }}
-        onChange={handleFileChange as unknown as React.ChangeEventHandler<HTMLInputElement>}
-      />
-
       {error && (
         <Banner
           type="critical"
@@ -141,21 +126,24 @@ const ImportUpload = ({ api }: ImportUploadProps) => {
         />
       )}
 
-      {/* File selection */}
+      {/* CSV content input */}
       {!isProcessing && !currentJob && (
         <Box css={{ stack: 'y', gap: 'small' }}>
-          <Box css={{ stack: 'x', gap: 'small', alignY: 'center' }}>
-            <Button type="secondary" onPress={handleFileSelect}>
-              Select CSV File
-            </Button>
-            {selectedFile && (
-              <Box>
-                {selectedFile.name} ({Math.round(selectedFile.size / 1024)} KB)
-              </Box>
-            )}
-          </Box>
+          <TextArea
+            label="Paste CSV content"
+            placeholder="id,name,description,active&#10;prod_xxx,My Product,Description,true&#10;..."
+            value={csvContent}
+            onChange={(e) => setCsvContent(e.target.value)}
+            rows={8}
+          />
+          
+          {csvContent.trim() && (
+            <Box css={{ color: 'secondary' }}>
+              {getRowCount()} data row(s) detected
+            </Box>
+          )}
 
-          {selectedFile && (
+          {csvContent.trim() && (
             <Box css={{ stack: 'y', gap: 'small' }}>
               <Checkbox
                 label="Dry run (preview changes without applying)"
@@ -200,25 +188,43 @@ const ImportUpload = ({ api }: ImportUploadProps) => {
 
       {/* Completion result */}
       {currentJob && currentJob.status === 'completed' && !isProcessing && (
-        <Banner
-          type="default"
-          title={dryRun ? 'Dry Run Complete' : 'Import Complete'}
-          description={
-            dryRun
-              ? `Preview: Would create ${currentJob.createdCount ?? 0}, update ${currentJob.updatedCount ?? 0}, skip ${currentJob.skippedCount ?? 0} products.`
-              : `Successfully created ${currentJob.createdCount ?? 0}, updated ${currentJob.updatedCount ?? 0} products. ${currentJob.skippedCount ?? 0} skipped.`
-          }
-          actions={
-            dryRun ? (
-              <Button onPress={() => {
-                setDryRun(false);
-                setCurrentJob(null);
-              }}>
-                Proceed with Import
-              </Button>
-            ) : undefined
-          }
-        />
+        <Box css={{ stack: 'y', gap: 'small' }}>
+          <Banner
+            type="default"
+            title={dryRun ? 'Dry Run Complete' : 'Import Complete'}
+            description={
+              dryRun
+                ? `Preview: Would create ${currentJob.createdCount ?? 0}, update ${currentJob.updatedCount ?? 0}, skip ${currentJob.skippedCount ?? 0} products.`
+                : `Successfully created ${currentJob.createdCount ?? 0}, updated ${currentJob.updatedCount ?? 0} products. ${currentJob.skippedCount ?? 0} skipped.`
+            }
+          />
+          {dryRun ? (
+            <Button type="primary" onPress={() => {
+              setDryRun(false);
+              setCurrentJob(null);
+            }}>
+              Proceed with Import
+            </Button>
+          ) : (
+            <Button type="secondary" onPress={handleReset}>
+              Import Another File
+            </Button>
+          )}
+        </Box>
+      )}
+
+      {/* Failed state */}
+      {currentJob && currentJob.status === 'failed' && !isProcessing && (
+        <Box css={{ stack: 'y', gap: 'small' }}>
+          <Banner
+            type="critical"
+            title="Import Failed"
+            description="The import encountered an error and could not complete."
+          />
+          <Button type="secondary" onPress={handleReset}>
+            Try Again
+          </Button>
+        </Box>
       )}
     </Box>
   );

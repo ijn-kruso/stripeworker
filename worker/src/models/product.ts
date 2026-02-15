@@ -12,6 +12,7 @@ export interface ProductCsvRow {
   name: string;                  // Required
   description?: string;
   active?: string;               // "true"/"false" or "1"/"0"
+  tax_code?: string;             // Stripe tax code (e.g., "txcd_99999999")
   [key: string]: string | undefined;  // Dynamic metadata.* and image.* columns
 }
 
