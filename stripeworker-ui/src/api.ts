@@ -7,7 +7,7 @@ import { fetchStripeSignature } from '@stripe/ui-extension-sdk/utils';
 // Backend API base URL - configure based on environment
 const API_BASE_URL = process.env.NODE_ENV === 'development'
   ? 'http://localhost:8787'
-  : 'https://stripeworker.workers.dev'; // Replace with actual deployment URL
+  : 'https://api.stripeworker.com';
 
 export interface SignedRequestBody {
   user_id: string;

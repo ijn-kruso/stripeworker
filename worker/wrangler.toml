@@ -16,6 +16,11 @@ preview_id = "2fb8d4c558974f54818c669a39f42c3a"
 binding = "STRIPEWORKER_FILES"
 bucket_name = "stripeworker-files"
 
+# Custom domain configuration
+[[routes]]
+pattern = "api.stripeworker.com"
+custom_domain = true
+
 # Secrets (set via wrangler secret put or .dev.vars)
 # STRIPE_SECRET_KEY - Platform's Stripe secret key
 # STRIPE_APP_SECRET - App signing secret for request verification

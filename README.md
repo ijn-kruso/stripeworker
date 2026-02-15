@@ -90,18 +90,37 @@ This opens the Stripe Dashboard with your app loaded in development mode.
 
 ## Deployment
 
-### Deploy Worker
+### Deploy Worker to Custom Domain
+
+The worker is configured to run at `api.stripeworker.com`.
+
+#### 1. Add Domain to Cloudflare
+
+1. In [Cloudflare Dashboard](https://dash.cloudflare.com), add `stripeworker.com` as a site
+2. Update your domain registrar's nameservers to Cloudflare's nameservers
+3. Wait for DNS propagation (can take up to 24h)
+
+#### 2. Set Production Secrets
 
 ```bash
 cd worker
-
-# Set production secrets
 yarn wrangler secret put STRIPE_SECRET_KEY
 yarn wrangler secret put STRIPE_APP_SECRET
+```
 
-# Deploy
+#### 3. Deploy the Worker
+
+```bash
+cd worker
 yarn wrangler deploy
 ```
+
+Cloudflare will automatically:
+- Provision SSL certificate for `api.stripeworker.com`
+- Create DNS record pointing to the worker
+- Route traffic from the custom domain
+
+Worker will be live at: `https://api.stripeworker.com`
 
 ### Upload Stripe App
 

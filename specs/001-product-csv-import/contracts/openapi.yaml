@@ -16,11 +16,8 @@ info:
     The backend verifies the signature using the app's signing secret before processing.
 
 servers:
-  - url: https://stripeworker.{account}.workers.dev
-    description: Production Cloudflare Worker
-    variables:
-      account:
-        default: your-account
+  - url: https://api.stripeworker.com
+    description: Production API
   - url: http://localhost:8787
     description: Local development (wrangler dev)
 

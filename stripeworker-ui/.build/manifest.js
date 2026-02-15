@@ -2,7 +2,7 @@
 import ProductListView from '../src/views/ProductListView';
 
 export * from '@stripe/ui-extension-sdk/version';
-export const BUILD_TIME = '2026-02-15 11:35:09.911246 +0100 CET m=+0.068524501';
+export const BUILD_TIME = '2026-02-15 12:59:12.8088861 +0100 CET m=+0.044014801';
 
 export { 
   ProductListView	
@@ -10,8 +10,9 @@ export {
 
 export default {
   "connect_permissions": null,
-  "icon": "./src/icon.svg",
-  "id": "com.example.stripeworker-csv",
+  "distribution_type": "private",
+  "icon": "./src/icon.png",
+  "id": "stripeworker.com",
   "name": "Stripeworker",
   "permissions": [
     {
@@ -25,16 +26,18 @@ export default {
   ],
   "post_install_action": {
     "type": "external",
-    "url": "https://github.com/your-org/stripeworker#readme"
+    "url": "https://stripeworker.com"
   },
   "stripe_api_access_type": "platform",
   "ui_extension": {
     "content_security_policy": {
       "connect-src": [
-        "http://localhost:8787/"
+        "https://api.stripeworker.com/export",
+        "https://api.stripeworker.com/import",
+        "https://api.stripeworker.com/jobs"
       ],
       "image-src": null,
-      "purpose": "Connect to local development backend for CSV import/export operations"
+      "purpose": "Connect to backend API for CSV import/export operations"
     },
     "views": [
       {
@@ -43,5 +46,5 @@ export default {
       }
     ]
   },
-  "version": "0.0.1"
+  "version": "1.0.0"
 };
