@@ -137,7 +137,7 @@ const ProductListView = ({ userContext }: ExtensionContextValue) => {
 
         <Box css={{ stack: 'y', gap: 'small' }}>
           <Box css={{ fontWeight: 'semibold' }}>Import Products</Box>
-          <Box>Upload a CSV file to create or update products.</Box>
+          <Box>Paste CSV content to create or update products.</Box>
           <ImportUpload api={api} />
         </Box>
       </Box>
