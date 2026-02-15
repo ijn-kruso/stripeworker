@@ -1,0 +1,26 @@
+name = "stripeworker"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+# Public environment variables
+
+# KV Namespace binding for job state storage
+[[kv_namespaces]]
+binding = "STRIPEWORKER_KV"
+id = "49d8c9d2a2854c3b921f6ac13f07b9b9"
+preview_id = "2fb8d4c558974f54818c669a39f42c3a"
+
+# R2 Bucket binding for CSV file storage
+[[r2_buckets]]
+binding = "STRIPEWORKER_FILES"
+bucket_name = "stripeworker-files"
+
+# Custom domain configuration
+[[routes]]
+pattern = "api.stripeworker.com"
+custom_domain = true
+
+# Secrets (set via wrangler secret put or .dev.vars)
+# STRIPE_SECRET_KEY - Platform's Stripe secret key
+# STRIPE_APP_SECRET - App signing secret for request verification

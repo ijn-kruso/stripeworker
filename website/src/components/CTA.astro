@@ -1,0 +1,120 @@
+---
+const marketplaceUrl = 'https://marketplace.stripe.com/apps/stripeworker';
+---
+
+<section class="cta section">
+  <div class="container">
+    <div class="cta-content text-center">
+      <h2>Ready to Simplify Your Product Management?</h2>
+      <p class="cta-description">
+        Join hundreds of businesses already using StripeWorker to manage their Stripe products efficiently. 
+        Install for free and start bulk editing today.
+      </p>
+      <div class="cta-buttons">
+        <a href={marketplaceUrl} class="btn btn-primary btn-lg" target="_blank" rel="noopener noreferrer">
+          Install from Stripe Marketplace
+          <svg class="arrow-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </a>
+      </div>
+      <div class="cta-badges">
+        <div class="badge">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span>Free to Install</span>
+        </div>
+        <div class="badge">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span>No Credit Card Required</span>
+        </div>
+        <div class="badge">
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span>Works with Existing Account</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta {
+    background: linear-gradient(135deg, var(--color-secondary) 0%, #0d3356 100%);
+    color: var(--color-white);
+  }
+  
+  .cta h2 {
+    color: var(--color-white);
+    margin-bottom: var(--space-6);
+  }
+  
+  .cta-description {
+    font-size: var(--font-size-lg);
+    color: rgba(255, 255, 255, 0.8);
+    max-width: 600px;
+    margin: 0 auto var(--space-8);
+    line-height: 1.7;
+  }
+  
+  .cta-buttons {
+    margin-bottom: var(--space-8);
+  }
+  
+  .cta .btn-primary {
+    background: var(--color-white);
+    color: var(--color-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+  
+  .cta .btn-primary:hover {
+    background: var(--color-background-alt);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+  }
+  
+  .arrow-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform var(--transition-fast);
+  }
+  
+  .cta .btn-primary:hover .arrow-icon {
+    transform: translateX(4px);
+  }
+  
+  .cta-badges {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+  }
+  
+  .badge {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: var(--font-size-sm);
+  }
+  
+  .badge svg {
+    width: 20px;
+    height: 20px;
+    color: var(--color-success);
+  }
+  
+  @media (max-width: 600px) {
+    .cta-badges {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+    }
+  }
+</style>
