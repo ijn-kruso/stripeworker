@@ -22,9 +22,19 @@
   "ui_extension": {
     "content_security_policy": {
       "connect-src": [
-        "https://api.stripeworker.com/export",
-        "https://api.stripeworker.com/import",
-        "https://api.stripeworker.com/jobs"
+        "https://api.stripeworker.com/health",
+        "https://api.stripeworker.com/export/start",
+        "https://api.stripeworker.com/export/",
+        "https://api.stripeworker.com/import/from-stripe-file",
+        "https://api.stripeworker.com/import/from-csv-content",
+        "https://api.stripeworker.com/import/upload-url",
+        "https://api.stripeworker.com/import/",
+        "https://api.stripeworker.com/jobs",
+        "https://api.stripeworker.com/jobs/",
+        "https://api.stripeworker.com/mappings",
+        "https://api.stripeworker.com/mappings/",
+        "https://api.stripeworker.com/storage/upload",
+        "https://api.stripeworker.com/storage/download"
       ],
       "image-src": null,
       "purpose": "Connect to backend API for CSV import/export operations"
@@ -36,5 +46,5 @@
       }
     ]
   },
-  "version": "1.0.0"
+  "version": "1.0.2"
 }
