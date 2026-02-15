@@ -1,49 +1,37 @@
-# Implementation Plan: Product CSV Import/Export
+# Implementation Plan: [FEATURE]
 
-**Branch**: `001-product-csv-import` | **Date**: 2026-02-14 | **Spec**: [spec.md](spec.md)
-**Input**: Feature specification from `/specs/001-product-csv-import/spec.md`
+**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
 ## Summary
 
-Build a Stripe App (UI extension embedded in Stripe Dashboard) enabling merchants to export products to CSV and import CSV files to create/update products in bulk. Uses Cloudflare Workers for serverless backend with client-side chunking for 100k+ row scale, Cloudflare KV/R2 for job/file storage, and Stripe Apps SDK for dashboard-embedded UI.
+[Extract from feature spec: primary requirement + technical approach from research]
 
 ## Technical Context
 
-**Language/Version**: TypeScript (strict mode enabled)  
-**Package Manager**: Yarn  
-**Primary Dependencies**: Cloudflare Workers SDK, Stripe SDK, Stripe Apps UI Extension SDK, Hono (web framework)  
-**Storage**: Cloudflare KV (job state), Cloudflare R2 (CSV file storage)  
-**Testing**: Manual testing for MVP; automated tests added when stability is needed  
-**Target Platform**: Cloudflare Workers (V8 isolates) for backend, Stripe Dashboard (embedded UI extension) for frontend  
-**Project Type**: web (backend worker + Stripe App UI extension)  
-**Performance Goals**: Export 10k products < 5 min, Import 10k products < 30 min, Dry-run < 2 min for 10k rows  
-**Constraints**: 50ms CPU per invocation (free tier), no persistent connections, streaming/pagination required, handle Stripe rate limits (100 requests/sec read, 25 writes/sec)  
-**Scale/Scope**: 100,000+ products, single tenant per request (Stripe merchant)  
-**Auth Model**: Stripe Apps signed requests (`fetchStripeSignature()` + app signing secret), platform key with `Stripe-Account` header
+<!--
+  ACTION REQUIRED: Replace the content in this section with the technical details
+  for the project. The structure here is presented in advisory capacity to guide
+  the iteration process.
+-->
+
+**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
+**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
+**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
+**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Project Type**: [single/web/mobile - determines source structure]  
+**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
+**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
+**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-| Principle | Status | Assessment |
-|-----------|--------|------------|
-| **I. Simplicity First (YAGNI)** | ✅ PASS | Start with export+import only, no pricing. Client-side chunking avoids Durable Objects complexity. Skip custom field mapping for MVP. |
-| **II. Scale Performance** | ✅ PASS | Design uses chunked client-side requests to stay within 50ms CPU limit. Pagination for Stripe API. Streaming CSV parsing. Job-based polling for long operations. |
-| **III. Serverless Architecture** | ✅ PASS | Cloudflare Workers runtime, KV for job state, R2 for file storage. No persistent connections. Stripe SDK with rate limit handling. |
-
-**Pre-design Gate**: PASS - All principles can be satisfied with planned approach.
-
-**Post-design Gate** (after Phase 1):
-
-| Principle | Status | Post-Design Assessment |
-|-----------|--------|------------------------|
-| **I. Simplicity First** | ✅ PASS | 4 entities defined (Product, Job, AppInstallation, FieldMapping). Clean REST API with 15 endpoints. FieldMapping deferred to P4. No unnecessary abstractions. |
-| **II. Scale Performance** | ✅ PASS | `/import/{jobId}/process` endpoint enables client-side chunking. Batch size configurable (100-500 rows). R2 presigned URLs avoid Worker memory usage. |
-| **III. Serverless** | ✅ PASS | All storage uses KV/R2. No WebSockets or persistent connections. OAuth tokens stored in KV. Job state survives browser close. |
-
-**Post-design Gate**: PASS - Design adheres to all constitution principles.
+[Gates determined based on constitution file]
 
 ## Project Structure
 
@@ -60,50 +48,57 @@ specs/[###-feature]/
 ```
 
 ### Source Code (repository root)
+<!--
+  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
+  for this feature. Delete unused options and expand the chosen structure with
+  real paths (e.g., apps/admin, packages/something). The delivered plan must
+  not include Option labels.
+-->
 
 ```text
-worker/
-├── src/
-│   ├── index.ts          # Worker entry point, route definitions
-│   ├── routes/
-│   │   ├── export.ts     # Export job endpoints
-│   │   ├── import.ts     # Import job endpoints
-│   │   └── jobs.ts       # Job status endpoints
-│   ├── services/
-│   │   ├── stripe.ts     # Stripe API client wrapper
-│   │   ├── csv.ts        # CSV parsing/generation
-│   │   └── jobs.ts       # Job state management
-│   ├── models/
-│   │   ├── product.ts    # Product type definitions
-│   │   └── job.ts        # Job type definitions
-│   └── lib/
-│       ├── auth.ts       # Stripe signature verification
-│       ├── validation.ts # CSV row validation
-│       └── mapping.ts    # Field mapping utilities
-├── wrangler.toml         # Worker configuration
-└── package.json
+# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
+src/
+├── models/
+├── services/
+├── cli/
+└── lib/
 
-stripeworker-ui/                   # Stripe App UI Extension
+tests/
+├── contract/
+├── integration/
+└── unit/
+
+# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
+backend/
 ├── src/
-│   ├── views/
-│   │   └── ProductListView.tsx   # Main app view (dashboard viewport)
+│   ├── models/
+│   ├── services/
+│   └── api/
+└── tests/
+
+frontend/
+├── src/
 │   ├── components/
-│   │   ├── ExportButton.tsx
-│   │   ├── ImportUpload.tsx
-│   │   ├── JobProgress.tsx
-│   │   └── FieldMapper.tsx
-│   └── api.ts                    # Backend API client with signature
-├── stripe-app.json               # Stripe App manifest
-├── package.json
-└── tsconfig.json
+│   ├── pages/
+│   └── services/
+└── tests/
+
+# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
+api/
+└── [same as backend above]
+
+ios/ or android/
+└── [platform-specific structure: feature modules, UI flows, platform tests]
 ```
 
-**Structure Decision**: Stripe App architecture with separate `worker/` (Cloudflare Workers backend) and `stripeworker-ui/` (Stripe App UI extension) as specified in constitution.
+**Structure Decision**: [Document the selected structure and reference the real
+directories captured above]
 
 ## Complexity Tracking
 
-> **No violations detected.** Design adheres to all constitution principles.
+> **Fill ONLY if Constitution Check has violations that must be justified**
 
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| None | N/A | N/A |
+| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
+| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
